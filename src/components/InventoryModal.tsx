@@ -87,34 +87,34 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
   const materials: MaterialItem[] = [
     {
       id: 'mat_hextech_chest',
-      name: 'Hextech Sandığı',
+      name: t('mat.chest_name', state.language),
       count: state.keys > 0 ? Math.max(1, Math.floor(state.keys / 1)) : 0,
       iconType: 'chest',
-      description: 'Hextech Anahtarı ile açılır. İçerisinden Şampiyon, Kostüm Kristalleri veya İhtişamlı Öz çıkar.',
+      description: t('mat.chest_desc', state.language),
       rarity: 'Common',
     },
     {
       id: 'mat_hextech_key',
-      name: 'Hextech Anahtarı',
+      name: t('mat.key_name', state.language),
       count: state.keys,
       iconType: 'key',
-      description: 'Hextech Sandıklarını açmak için kullanılır. Baron seviye atlamalarında kazanılır.',
+      description: t('mat.key_desc', state.language),
       rarity: 'Common',
     },
     {
       id: 'mat_orange_essence',
-      name: 'Turuncu Öz',
+      name: t('mat.oe_name', state.language),
       count: state.orangeEssence,
       iconType: 'orange_essence',
-      description: 'Kostüm kristallerini kalıcı kostümlere dönüştürmek ve geliştirmeler yapmak için kullanılır.',
+      description: t('mat.oe_desc', state.language),
       rarity: 'Epic',
     },
     {
       id: 'mat_mythic_essence',
-      name: 'İhtişamlı Öz (Mor Cevher)',
+      name: t('mat.me_name', state.language),
       count: state.gemstones,
       iconType: 'gemstone',
-      description: 'Prestij ve İhtişamlı Mağaza kostümlerini üretmek için kullanılan en nadir para birimi.',
+      description: t('mat.me_desc', state.language),
       rarity: 'Mythic',
     },
   ];
@@ -452,11 +452,11 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                         <div className="flex items-center gap-2">
                           <RefreshCw className="w-4 h-4 text-[#00c8c8] animate-spin" />
                           <h4 className="text-sm font-black uppercase text-[#00c8c8] tracking-widest font-['Cinzel',serif]">
-                            3'ü 1 Arada Yeniden İşleme Masası
+                            {t('inv.reroll.table_title_shard', state.language)}
                           </h4>
                         </div>
                         <p className="text-xs text-[#a09b8c] mt-0.5">
-                          3 kostüm kristalini feda et, kalıcı ve rastgele yeni bir kostüm kazan!
+                          {t('inv.reroll.table_desc_shard', state.language)}
                         </p>
                       </div>
 
@@ -468,7 +468,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                           }}
                           className="px-3 py-1.5 bg-[#010a13] hover:bg-[#1e2328] border border-[#785a28] text-[#a09b8c] hover:text-[#f0e6d2] text-xs font-bold uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
                         >
-                          İptal
+                          {t('inv.reroll.cancel', state.language)}
                         </button>
 
                         <button
@@ -483,8 +483,8 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                           <Sparkles className="w-4 h-4" />
                           <span>
                             {rerollSelectedIds.length === 3
-                              ? 'Yeniden İşle ve Yeni Kostüm Al!'
-                              : `${3 - rerollSelectedIds.length} Kristal Daha Seç`}
+                              ? t('inv.reroll.submit_ready', state.language)
+                              : t('inv.reroll.submit_more_shards', state.language)?.replace('{count}', String(3 - rerollSelectedIds.length))}
                           </span>
                         </button>
                       </div>
@@ -517,7 +517,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                               <button
                                 onClick={() => handleToggleReroll(item.id)}
                                 className="relative z-10 p-1 bg-black/80 hover:bg-[#ff0055] border border-white/40 hover:border-white rounded-xs text-white transition-colors cursor-pointer"
-                                title="Kaldır"
+                                title={t('inv.reroll.remove', state.language)}
                               >
                                 <X className="w-3.5 h-3.5" />
                               </button>
@@ -531,7 +531,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                           >
                             <Plus className="w-5 h-5 text-[#c8aa6e]/60 mb-0.5 animate-pulse" />
                             <span className="text-[10px] uppercase font-bold text-[#c8aa6e]/80">
-                              {t('inv.tab.slot_select', state.language)?.replace('{index}', String(slotIndex + 1))}
+                              {t('inv.reroll.select_shard_slot', state.language)?.replace('{index}', String(slotIndex + 1))}
                             </span>
                           </div>
                         );
@@ -568,7 +568,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                         className="mt-4 px-4 py-2 bg-gradient-to-r from-[#c89b3c] to-[#785a28] hover:brightness-125 text-[#010a13] font-black text-xs uppercase tracking-wider rounded-xs flex items-center gap-1.5 shadow-[0_0_12px_rgba(200,155,60,0.4)] cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        <span>Sandık Aç ({state.keys} Anahtar)</span>
+                        <span>{t('inv.open_chest_keys', state.language)?.replace('{keys}', String(state.keys))}</span>
                       </button>
                     </div>
                   ) : (
@@ -613,7 +613,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                             {/* Top Badges: Shard Crystal Tag */}
                             <div className="relative z-10 p-2 flex items-center justify-between w-full">
                               <span className="px-1.5 py-0.5 rounded-xs text-[9px] font-black uppercase bg-[#00c8c8] text-[#010a13] shadow">
-                                KRİSTAL 💎
+                                {t('inv.shard_tag', state.language)}
                               </span>
 
                               {/* Rarity Diamond */}
@@ -621,7 +621,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                                 className={`w-3 h-3 rotate-45 border rounded-xs ${getRarityDiamondColor(
                                   shard.rarity
                                 )}`}
-                                title={getRarityLabel(shard.rarity)}
+                                title={getRarityLabel(shard.rarity, state.language)}
                               ></div>
                             </div>
 
@@ -649,7 +649,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
 
                               {/* Upgrade Cost Indicator */}
                               <div className="mt-1.5 pt-1.5 border-t border-[#1e2328] flex items-center justify-between text-[10px]">
-                                <span className="text-[#a09b8c]">Açma:</span>
+                                <span className="text-[#a09b8c]">{t('inv.upgrade_cost_label', state.language)}</span>
                                 <span
                                   className={`font-black flex items-center gap-1 ${
                                     canAffordUpgrade ? 'text-[#ff7700]' : 'text-[#788896]'
@@ -673,7 +673,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                     <div className="flex items-center gap-2">
                       <Boxes className="w-4 h-4 text-[#c8aa6e]" />
                       <h3 className="text-sm font-black uppercase tracking-widest text-[#a09b8c] font-['Cinzel',serif]">
-                        Ganimet Malzemeleri
+                        {t('inv.materials_title', state.language)}
                       </h3>
                     </div>
                   </div>
@@ -718,7 +718,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
 
                           <div className="min-w-0 flex-1">
                             <h4 className="text-xs font-bold text-white truncate leading-tight">{mat.name}</h4>
-                            <span className="text-xs font-black text-[#c8aa6e]">Miktar: {mat.count}</span>
+                            <span className="text-xs font-black text-[#c8aa6e]">{t('inv.material_qty', state.language)}: {mat.count}</span>
                           </div>
                         </div>
                       );
@@ -741,11 +741,11 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                         <div className="flex items-center gap-2">
                           <RefreshCw className="w-4 h-4 text-[#00c8c8] animate-spin" />
                           <h4 className="text-sm font-black uppercase text-[#00c8c8] tracking-widest font-['Cinzel',serif]">
-                            3'ü 1 Arada Yeniden İşleme Masası
+                            {t('inv.reroll.table_title_skin', state.language)}
                           </h4>
                         </div>
                         <p className="text-xs text-[#a09b8c] mt-0.5">
-                          3 kalıcı kostümü feda et, kalıcı ve rastgele yeni bir kostüm kazan!
+                          {t('inv.reroll.table_desc_skin', state.language)}
                         </p>
                       </div>
 
@@ -757,7 +757,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                           }}
                           className="px-3 py-1.5 bg-[#010a13] hover:bg-[#1e2328] border border-[#785a28] text-[#a09b8c] hover:text-[#f0e6d2] text-xs font-bold uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
                         >
-                          İptal
+                          {t('inv.reroll.cancel', state.language)}
                         </button>
 
                         <button
@@ -772,8 +772,8 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                           <Sparkles className="w-4 h-4" />
                           <span>
                             {rerollSelectedIds.length === 3
-                              ? 'Yeniden İşle ve Yeni Kostüm Al!'
-                              : `${3 - rerollSelectedIds.length} Kostüm Daha Seç`}
+                              ? t('inv.reroll.submit_ready', state.language)
+                              : t('inv.reroll.submit_more_skins', state.language)?.replace('{count}', String(3 - rerollSelectedIds.length))}
                           </span>
                         </button>
                       </div>
@@ -806,7 +806,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                               <button
                                 onClick={() => handleToggleReroll(item.id)}
                                 className="relative z-10 p-1 bg-black/80 hover:bg-[#ff0055] border border-white/40 hover:border-white rounded-xs text-white transition-colors cursor-pointer"
-                                title="Kaldır"
+                                title={t('inv.reroll.remove', state.language)}
                               >
                                 <X className="w-3.5 h-3.5" />
                               </button>
@@ -820,7 +820,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                           >
                             <Plus className="w-5 h-5 text-[#c8aa6e]/60 mb-0.5 animate-pulse" />
                             <span className="text-[10px] uppercase font-bold text-[#c8aa6e]/80">
-                              {slotIndex + 1}. Kostüm Seç
+                              {t('inv.reroll.select_slot', state.language)?.replace('{index}', String(slotIndex + 1))}
                             </span>
                           </div>
                         );
@@ -926,7 +926,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                                       <span
                                         className={`px-1.5 py-0.5 rounded-xs text-[9px] font-black uppercase shadow ${rarityInfo.badge}`}
                                       >
-                                        {getRarityLabel(skin.rarity)}
+                                        {getRarityLabel(skin.rarity, state.language)}
                                       </span>
 
                                       {/* Rarity Diamond */}
@@ -965,7 +965,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                                           <span>{t('inv.badge.permanent', state.language)}</span>
                                         </span>
                                         {skin.rarity === 'Prestige' && (
-                                          <span className="text-[#d442f5] font-bold">👑 Prestij</span>
+                                          <span className="text-[#d442f5] font-bold">{t('inv.tag.prestige', state.language)}</span>
                                         )}
                                       </div>
                                     </div>
@@ -1043,7 +1043,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                                 getRarityColor(selectedItem.data.rarity).badge
                               }`}
                             >
-                              {getRarityLabel(selectedItem.data.rarity)}
+                              {getRarityLabel(selectedItem.data.rarity, state.language)}
                             </span>
                             <span className="text-xs text-[#00c8c8] font-semibold">
                               {selectedItem.type === 'shard' ? t('inv.type.shard', state.language) : t('inv.type.permanent', state.language)}
@@ -1093,7 +1093,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({
                           className="w-full py-2 bg-[#1e2328] hover:bg-[#ff7700]/20 border border-[#ff7700]/60 text-[#ff7700] text-xs font-bold uppercase tracking-wider rounded-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
-                          <span>Öze Ayrıştır (+{selectedItem.data.disenchantValue})</span>
+                          <span>{t('inv.disenchant_btn', state.language)?.replace('{val}', String(selectedItem.data.disenchantValue))}</span>
                           <OrangeEssenceIcon className="w-3.5 h-3.5" />
                         </button>
 

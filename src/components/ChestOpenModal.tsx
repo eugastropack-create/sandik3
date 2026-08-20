@@ -5,6 +5,7 @@ import { useGame } from '../context/GameContext';
 import { HextechChestAnimation } from './HextechChestAnimation';
 import { LootDrop } from '../types';
 import { getRarityLabel } from '../services/dataDragon';
+import { t } from '../i18n/translations';
 
 export const ChestOpenModal: React.FC = () => {
   const { state, activeChestModal, closeChestModal, claimSkin, claimDrop } = useGame();
@@ -20,7 +21,7 @@ export const ChestOpenModal: React.FC = () => {
         id: `drop_${skin.id}_${idx}`,
         type: 'skin',
         title: skin.skinName,
-        subtitle: `${getRarityLabel(skin.rarity)} Kostüm Kristali`,
+        subtitle: `${getRarityLabel(skin.rarity, state.language)} ${t('inv.type.shard', state.language)}`,
         rarity: skin.rarity,
         imageUrl: skin.splashUrl,
         skin: skin,
@@ -63,13 +64,13 @@ export const ChestOpenModal: React.FC = () => {
           <div className="bg-[#0a1428] px-4 py-2.5 border-b border-[#1e2328] flex items-center justify-between relative z-30">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#f0e6d2]">
               <span className="text-[#c8aa6e]">❖</span>
-              <span>Hextech Zanaatkârlığı</span>
+              <span>{t('modal.chest.title', state.language)}</span>
             </div>
 
             <button
               onClick={closeChestModal}
               className="p-1 rounded-xs text-[#a09b8c] hover:text-[#f0e6d2] hover:bg-[#1e2328] transition-colors cursor-pointer"
-              title="Kapat"
+              title={t('common.close', state.language)}
             >
               <X className="w-4 h-4" />
             </button>

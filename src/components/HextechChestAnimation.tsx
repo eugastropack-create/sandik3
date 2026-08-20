@@ -224,9 +224,9 @@ export const HextechChestAnimation: React.FC<HextechChestAnimationProps> = ({
       {/* 2. Top Header: HEXTECH CHEST ❓ */}
       <div className="relative z-20 flex items-center justify-center gap-2 pt-2">
         <h2 className="font-serif uppercase tracking-[0.25em] text-xs md:text-sm text-[#f0e6d2] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-bold">
-          Hextech Sandığı
+          {t('chest.type.hextech', state.language)}
         </h2>
-        <div className="w-4 h-4 rounded-full border border-[#c8aa6e]/60 flex items-center justify-center bg-[#010a13]/80 cursor-pointer hover:border-[#f0e6d2] transition-colors" title="Hextech Ganimet İçeriği">
+        <div className="w-4 h-4 rounded-full border border-[#c8aa6e]/60 flex items-center justify-center bg-[#010a13]/80 cursor-pointer hover:border-[#f0e6d2] transition-colors" title={t('nav.loot', state.language)}>
           <HelpCircle className="w-2.5 h-2.5 text-[#c8aa6e]" />
         </div>
       </div>
@@ -432,7 +432,7 @@ export const HextechChestAnimation: React.FC<HextechChestAnimationProps> = ({
                     <>
                       <span className={`font-semibold flex items-center gap-1 ${rarityColor?.text || 'text-[#00c8c8]'}`}>
                         <span className="text-[10px]">▲</span>
-                        <span>{currentDrop.subtitle || getRarityLabel(currentDrop.rarity || 'Epic')}</span>
+                        <span>{currentDrop.subtitle || getRarityLabel(currentDrop.rarity || 'Epic', state.language)}</span>
                       </span>
                       <span className="text-[#5c5b57]">•</span>
                       <span className="text-[11px] text-[#c8aa6e] flex items-center gap-1">
@@ -442,7 +442,7 @@ export const HextechChestAnimation: React.FC<HextechChestAnimationProps> = ({
                     </>
                   ) : (
                     <span className="font-semibold text-[#c8aa6e] tracking-wider uppercase text-[11px]">
-                      {currentDrop?.subtitle || 'Malzeme'}
+                      {currentDrop?.subtitle || t('inv.type.material', state.language)}
                     </span>
                   )}
                 </div>

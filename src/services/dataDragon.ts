@@ -755,7 +755,18 @@ export function getRarityColor(rarity: SkinRarity): { text: string; bg: string; 
   }
 }
 
-export function getRarityLabel(rarity: SkinRarity): string {
+export function getRarityLabel(rarity: SkinRarity, lang: 'tr' | 'en' = 'tr'): string {
+  if (lang === 'en') {
+    switch (rarity) {
+      case 'Prestige': return 'Prestige';
+      case 'Mythic': return 'Mythic';
+      case 'Ultimate': return 'Ultimate';
+      case 'Legendary': return 'Legendary';
+      case 'Epic': return 'Epic';
+      case 'Common': return 'Standard';
+      default: return rarity;
+    }
+  }
   switch (rarity) {
     case 'Prestige': return 'Prestij';
     case 'Mythic': return 'İhtişamlı';

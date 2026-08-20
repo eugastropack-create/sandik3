@@ -21,7 +21,7 @@ export const SkinUnlockModal: React.FC<SkinUnlockModalProps> = ({
   if (!unlockedSkin) return null;
 
   const rarityInfo = getRarityColor(unlockedSkin.rarity);
-  const rarityLabel = getRarityLabel(unlockedSkin.rarity);
+  const rarityLabel = getRarityLabel(unlockedSkin.rarity, state.language);
 
   return (
     <AnimatePresence>
@@ -48,7 +48,7 @@ export const SkinUnlockModal: React.FC<SkinUnlockModalProps> = ({
               <span>{t('modal.unlock.title', state.language)}</span>
             </div>
             <div className="px-2 py-0.5 rounded-xs text-[10px] font-bold uppercase bg-[#c89b3c]/20 border border-[#c8aa6e] text-[#f0e6d2]">
-              Hextech Zanaatkârlığı
+              {t('nav.hextech', state.language)}
             </div>
           </div>
 

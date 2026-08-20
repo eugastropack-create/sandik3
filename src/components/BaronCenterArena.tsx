@@ -193,7 +193,7 @@ export const BaronCenterArena: React.FC = () => {
                     ? 'border-[#00c8c8] bg-[#0a1428] shadow-[0_0_15px_#00c8c8] hover:scale-110 active:scale-95'
                     : 'border-[#1e2328] bg-[#1e2328] opacity-70 cursor-not-allowed'
                 }`}
-                title="Q: Alfa Vuruşu (Alpha Strike)"
+                title={t('arena.alpha_strike', state.language)}
               >
                 <img
                   src="https://ddragon.leagueoflegends.com/cdn/14.20.1/img/spell/AlphaStrike.png"

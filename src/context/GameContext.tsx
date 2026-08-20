@@ -239,9 +239,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         soundFx.playLevelUp();
         setTimeout(() => soundFx.playKeyEarned(), 400);
         triggerConfetti('level');
+        const lang = prev.language;
         addToast({
-          title: state.language === 'tr' ? `SEVİYE ATLADIN! Seviye ${curLevel}` : `LEVEL UP! Level ${curLevel}`,
-          description: state.language === 'tr' ? `Tebrikler! +1 Hextech Anahtarı kazandın. (Toplam: ${newKeys})` : `Congratulations! +1 Hextech Key earned. (Total: ${newKeys})`,
+          title: t('toast.level_up_title', lang).replace('{level}', String(curLevel)),
+          description: t('toast.level_up_desc', lang).replace('{keys}', String(newKeys)),
           type: 'level_up',
           icon: '🗝️'
         });
@@ -268,6 +269,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, 1600);
 
     const currentState = stateRef.current;
+    const currentLang = currentState.language;
     
     // Check Crit
     const isCrit = Math.random() < currentState.critChance;
@@ -288,7 +290,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const newFloatingTexts: FloatingText[] = [
       {
         id: `float_${Date.now()}_${Math.random()}`,
-        text: isCrit ? `⚔️ KRİTİK +${totalGainedXP} XP!` : `+${totalGainedXP} XP`,
+        text: isCrit ? t('float.crit', currentLang).replace('{xp}', String(totalGainedXP)) : `+${totalGainedXP} XP`,
         x: spawnX,
         y: spawnY,
         type: isCrit ? 'crit' : 'xp'
@@ -319,10 +321,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     soundFx.playAlphaStrike();
     
     const burstXP = Math.round(state.clickPower * 12 * comboMultiplier);
+    const currentLang = stateRef.current.language;
     
     // Spawn multiple floating hits
     const floats: FloatingText[] = [
-      { id: `alpha_1_${Date.now()}`, text: '⚔️ ALFA VURUŞU!', x: window.innerWidth / 2 - 60, y: window.innerHeight / 2 - 80, type: 'alphastrike' },
+      { id: `alpha_1_${Date.now()}`, text: t('float.alpha', currentLang), x: window.innerWidth / 2 - 60, y: window.innerHeight / 2 - 80, type: 'alphastrike' },
       { id: `alpha_2_${Date.now()}`, text: `+${burstXP} XP`, x: window.innerWidth / 2 + 40, y: window.innerHeight / 2 - 40, type: 'crit' },
     ];
     setFloatingTexts(prev => [...prev.slice(-15), ...floats]);
@@ -356,9 +359,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Hextech Chest Opening
   const openChest = useCallback((count: number = 1): boolean => {
-    if (state.keys < count) {
+    const currentLang = stateRef.current.language;
+    if (stateRef.current.keys < count) {
       addToast({
-        title: state.language === 'tr' ? 'Yetersiz Anahtar!' : 'Not Enough Keys!', description: state.language === 'tr' ? `Sandık açmak için en az ${count} adet Hextech Anahtarı gerekiyor.` : `You need at least ${count} Hextech Keys to open chests.`,
+        title: t('toast.not_enough_keys_title', currentLang),
+        description: t('toast.not_enough_keys_desc', currentLang).replace('{count}', String(count)),
         type: 'info',
         icon: '🗝️'
       });
@@ -379,20 +384,20 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: `drop_skin_${Date.now()}_${i}_${Math.random()}`,
         type: 'skin',
         title: skin.skinName,
-        subtitle: `${getRarityLabel(skin.rarity)} Kostüm Kristali`,
+        subtitle: `${getRarityLabel(skin.rarity, currentLang)} ${t('inv.type.shard', currentLang)}`,
         rarity: skin.rarity,
         imageUrl: skin.splashUrl,
         skin: skin,
       });
 
       // Mor Cevher Drop (5% base + up to +10% from upgrades)
-      const gemChance = state.gemFinderChance;
+      const gemChance = stateRef.current.gemFinderChance;
       if (Math.random() < gemChance) {
         dropItems.push({
           id: `drop_gem_${Date.now()}_${i}`,
           type: 'gemstone',
-          title: '1 Mor Cevher',
-          subtitle: 'İhtişamlı Öz',
+          title: currentLang === 'tr' ? '1 Mor Cevher' : '1 Gemstone',
+          subtitle: currentLang === 'tr' ? 'İhtişamlı Öz' : 'Mythic Essence',
           rarity: 'Mythic',
           gemstonesAmount: 1,
         });
@@ -404,7 +409,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newRecent: RecentDrop[] = unboxedList.map(s => ({
         id: `drop_${Date.now()}_${Math.random()}`,
         skin: s,
-        username: prev.username || 'Sen',
+        username: prev.username || t('recent.you', prev.language),
         timestamp: Date.now(),
         isPrestige: s.rarity === 'Prestige',
         isCurrentUser: true,
@@ -426,7 +431,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return true;
-  }, [state.keys, addToast]);
+  }, [addToast]);
 
   const rerollSkins = useCallback((skinIds: string[]) => {
     if (skinIds.length !== 3) return;
@@ -450,8 +455,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       newSkin.upgradeCost = 0;
       createdSkin = newSkin;
 
+      const lang = prev.language;
       addToast({
-        title: state.language === 'tr' ? '✨ YENİDEN İŞLEME BAŞARILI!' : '✨ REROLL SUCCESSFUL!', description: state.language === 'tr' ? `3 kostüm birleştirildi ve kalıcı ${newSkin.skinName} elde edildi!` : `3 skins forged into permanent ${newSkin.skinName}!`,
+        title: t('toast.reroll_success_title', lang),
+        description: t('toast.reroll_success_desc', lang).replace('{skinName}', newSkin.skinName),
         type: 'skin',
         icon: '✨',
       });
@@ -464,7 +471,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           {
             id: `drop_${Date.now()}_${Math.random()}`,
             skin: newSkin,
-            username: prev.username || 'Sen',
+            username: prev.username || t('recent.you', prev.language),
             timestamp: Date.now(),
             isPrestige: newSkin.rarity === 'Prestige',
             isCurrentUser: true,
@@ -483,8 +490,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const claimShard = useCallback((skin: SkinItem) => {
     soundFx.playButtonClick();
     setState(prev => {
+      const lang = prev.language;
       addToast({
-        title: state.language === 'tr' ? 'Kristal Eklendi!' : 'Shard Added!', description: state.language === 'tr' ? `${skin.skinName} kostüm kristali ganimetine eklendi!` : `${skin.skinName} skin shard added to your loot!`,
+        title: t('toast.shard_added_title', lang),
+        description: t('toast.shard_added_desc', lang).replace('{skinName}', skin.skinName),
         type: 'skin',
         icon: '💎'
       });
@@ -497,19 +506,22 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const claimDrop = useCallback((drop: LootDrop) => {
     soundFx.playAddToLoot();
+    const currentLang = stateRef.current.language;
     if (drop.type === 'skin' && drop.skin) {
       claimShard(drop.skin);
     } else if (drop.type === 'key' && drop.keysAmount) {
       setState(prev => ({ ...prev, keys: prev.keys + drop.keysAmount! }));
       addToast({
-        title: state.language === 'tr' ? '+1 Hextech Anahtarı!' : '+1 Hextech Key!', description: state.language === 'tr' ? 'Envanterine yeni bir anahtar eklendi.' : 'A new key was added to your inventory.',
+        title: t('toast.key_added_title', currentLang),
+        description: t('toast.key_added_desc', currentLang),
         type: 'key',
         icon: '🗝️'
       });
     } else if (drop.type === 'essence' && drop.essenceAmount) {
       setState(prev => ({ ...prev, orangeEssence: prev.orangeEssence + drop.essenceAmount! }));
       addToast({
-        title: state.language === 'tr' ? `+${drop.essenceAmount} Turuncu Öz!` : `+${drop.essenceAmount} Orange Essence!`, description: state.language === 'tr' ? 'Öz ganimetine eklendi.' : 'Essence added to your loot.',
+        title: t('toast.essence_added_title', currentLang).replace('{amount}', String(drop.essenceAmount)),
+        description: t('toast.essence_added_desc', currentLang),
         type: 'info',
         icon: '🔶'
       });
@@ -517,14 +529,16 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setState(prev => ({ ...prev, gemstones: prev.gemstones + drop.gemstonesAmount! }));
       soundFx.playGemstoneDrop();
       addToast({
-        title: state.language === 'tr' ? '+1 Mor Cevher!' : '+1 Gemstone!', description: state.language === 'tr' ? 'İhtişamlı Mağazada harcanabilir!' : 'Can be spent in the Mythic Shop!',
+        title: t('toast.gemstone_added_title', currentLang),
+        description: t('toast.gemstone_added_desc', currentLang),
         type: 'gemstone',
         icon: '💎'
       });
     } else if (drop.type === 'chest') {
       setState(prev => ({ ...prev, keys: prev.keys + 1 }));
       addToast({
-        title: state.language === 'tr' ? '+1 Hextech Sandığı & Anahtarı!' : '+1 Hextech Chest & Key!', description: state.language === 'tr' ? 'Bonus sandık kazandın!' : 'You earned a bonus chest!',
+        title: t('toast.chest_added_title', currentLang),
+        description: t('toast.chest_added_desc', currentLang),
         type: 'info',
         icon: '🎁'
       });
@@ -534,9 +548,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const disenchantShard = useCallback((shard: SkinItem) => {
     soundFx.playButtonClick();
     setState(prev => {
+      const lang = prev.language;
       const gained = shard.disenchantValue;
       addToast({
-        title: state.language === 'tr' ? 'Öze Ayrıştırıldı!' : 'Disenchanted!', description: state.language === 'tr' ? `${shard.skinName} ayrıştırıldı ve +${gained} Turuncu Öz kazanıldı.` : `${shard.skinName} disenchanted for +${gained} Orange Essence.`,
+        title: t('toast.disenchant_success_title', lang),
+        description: t('toast.disenchant_success_desc', lang).replace('{skinName}', shard.skinName).replace('{oe}', String(gained)),
         type: 'info',
         icon: '🔶'
       });
@@ -550,11 +566,14 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const upgradeShard = useCallback((shard: SkinItem): boolean => {
     soundFx.playButtonClick();
+    const currentLang = stateRef.current.language;
+    const currentState = stateRef.current;
     
     // Check if player has enough orange essence
-    if (state.orangeEssence < shard.upgradeCost) {
+    if (currentState.orangeEssence < shard.upgradeCost) {
       addToast({
-        title: state.language === 'tr' ? 'Yetersiz Turuncu Öz!' : 'Not Enough Orange Essence!', description: state.language === 'tr' ? `Bu kostümü kalıcı yapmak için ${shard.upgradeCost} Turuncu Öz gerekiyor.` : `You need ${shard.upgradeCost} Orange Essence to make this permanent.`,
+        title: t('toast.not_enough_oe_title', currentLang),
+        description: t('toast.not_enough_oe_desc', currentLang).replace('{cost}', String(shard.upgradeCost)),
         type: 'info',
         icon: '🔶'
       });
@@ -562,10 +581,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Check if skin is already in inventory
-    const exists = state.inventory.some(s => s.championId === shard.championId && s.num === shard.num);
+    const exists = currentState.inventory.some(s => s.championId === shard.championId && s.num === shard.num);
     if (exists) {
       addToast({
-        title: state.language === 'tr' ? 'Zaten Koleksiyonda!' : 'Already Owned!', description: state.language === 'tr' ? `${shard.skinName} kalıcı olarak zaten envanterinde var.` : `You already own ${shard.skinName} permanently.`,
+        title: t('toast.already_owned_title', currentLang),
+        description: t('toast.already_owned_desc', currentLang).replace('{skinName}', shard.skinName),
         type: 'info',
         icon: '❌'
       });
@@ -584,7 +604,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUnlockedSkinModal(shard);
     
     return true;
-  }, [state.orangeEssence, state.inventory, addToast]);
+  }, [addToast]);
 
   const confirmAddUnlockedSkin = useCallback((shard: SkinItem) => {
     soundFx.playAddToLoot();
@@ -595,9 +615,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         : [{ ...shard, isOwned: true, unlockedAt: Date.now() }, ...prev.inventory];
       
       const newShards = prev.shards.filter(s => s.id !== shard.id);
+      const lang = prev.language;
 
       addToast({
-        title: state.language === 'tr' ? '✨ Envantere Eklendi!' : '✨ Added to Inventory!', description: state.language === 'tr' ? `${shard.skinName} başarıyla kalıcı envanterine eklendi.` : `${shard.skinName} was permanently added to your inventory.`,
+        title: t('toast.unlocked_added_title', lang),
+        description: t('toast.unlocked_added_desc', lang).replace('{skinName}', shard.skinName),
         type: 'skin',
         icon: '✨'
       });
@@ -610,7 +632,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
           {
             id: `drop_${Date.now()}_${Math.random()}`,
             skin: shard,
-            username: prev.username || 'Sen',
+            username: prev.username || t('recent.you', prev.language),
             timestamp: Date.now(),
             isPrestige: shard.rarity === 'Prestige',
             isCurrentUser: true,
@@ -632,9 +654,13 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [unlockedSkinModal, confirmAddUnlockedSkin]);
 
   const buyPrestigeSkin = useCallback((item: PrestigeItem): boolean => {
-    if (state.gemstones < item.gemstoneCost) {
+    const currentLang = stateRef.current.language;
+    const currentState = stateRef.current;
+
+    if (currentState.gemstones < item.gemstoneCost) {
       addToast({
-        title: state.language === 'tr' ? 'Yetersiz Mor Cevher!' : 'Not Enough Gemstones!', description: state.language === 'tr' ? `Bu kostümü almak için ${item.gemstoneCost} Mor Cevher gerekiyor.` : `You need ${item.gemstoneCost} Gemstones to craft this skin.`,
+        title: t('toast.not_enough_gem_title', currentLang),
+        description: t('toast.not_enough_gem_desc_cost', currentLang).replace('{cost}', String(item.gemstoneCost)),
         type: 'info',
         icon: '💎'
       });
@@ -642,9 +668,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Check if already owned
-    if (state.inventory.some(s => s.championId === item.championId && s.num === item.num)) {
+    if (currentState.inventory.some(s => s.championId === item.championId && s.num === item.num)) {
       addToast({
-        title: state.language === 'tr' ? 'Zaten Sahipsin!' : 'Already Owned!', description: state.language === 'tr' ? `${item.skinName} zaten prestij koleksiyonunda bulunuyor!` : `${item.skinName} is already in your mythic collection!`,
+        title: t('toast.prestige_already_title', currentLang),
+        description: t('toast.prestige_already_desc', currentLang).replace('{skinName}', item.skinName),
         type: 'info',
         icon: '👑'
       });
@@ -680,7 +707,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
         {
           id: `drop_prestige_${Date.now()}`,
           skin: prestigeSkin,
-          username: prev.username || 'Sen',
+          username: prev.username || t('recent.you', prev.language),
           timestamp: Date.now(),
           isPrestige: true,
           isCurrentUser: true,
@@ -690,38 +717,43 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
 
     addToast({
-      title: state.language === 'tr' ? '👑 PRESTİJ KOSTÜM KAZANILDI!' : '👑 MYTHIC SKIN ACQUIRED!', description: state.language === 'tr' ? `${item.skinName} başarıyla üretildi ve envanterine katıldı!` : `${item.skinName} successfully crafted and added to inventory!`,
+      title: t('toast.prestige_acquired_title', currentLang),
+      description: t('toast.prestige_acquired_desc', currentLang).replace('{skinName}', item.skinName),
       type: 'prestige',
       icon: '👑'
     });
 
     return true;
-  }, [state.gemstones, state.inventory, addToast]);
+  }, [addToast]);
 
   const buyUpgrade = useCallback((upgradeId: string): boolean => {
+    const currentLang = stateRef.current.language;
+    const currentState = stateRef.current;
     const def = UPGRADE_DEFINITIONS.find(u => u.id === upgradeId);
     if (!def) return false;
 
-    const currentLvl = state.upgrades[upgradeId] || 0;
+    const currentLvl = currentState.upgrades[upgradeId] || 0;
     if (currentLvl >= def.maxLevel) {
-      addToast({ title: t('toast.max_level_title', state.language), description: t('toast.max_level_desc', state.language), type: 'info' });
+      addToast({ title: t('toast.max_level_title', currentLang), description: t('toast.max_level_desc', currentLang), type: 'info' });
       return false;
     }
 
     const currentCost = Math.round(def.baseCost * Math.pow(def.costMultiplier, currentLvl));
 
     if (def.costCurrency === 'xp') {
-      if (state.xp < currentCost) {
+      if (currentState.xp < currentCost) {
         addToast({
-          title: state.language === 'tr' ? 'Yetersiz XP!' : 'Not Enough XP!', description: state.language === 'tr' ? `Bu geliştirme için ${currentCost} XP gerekiyor.` : `This upgrade requires ${currentCost} XP.`,
+          title: t('toast.not_enough_xp_title', currentLang),
+          description: t('toast.not_enough_xp_desc', currentLang).replace('{cost}', String(currentCost)),
           type: 'info'
         });
         return false;
       }
     } else if (def.costCurrency === 'orangeEssence') {
-      if (state.orangeEssence < currentCost) {
+      if (currentState.orangeEssence < currentCost) {
         addToast({
-          title: state.language === 'tr' ? 'Yetersiz Turuncu Öz!' : 'Not Enough Orange Essence!', description: state.language === 'tr' ? `Bu geliştirme için ${currentCost} Turuncu Öz gerekiyor.` : `This upgrade requires ${currentCost} Orange Essence.`,
+          title: t('toast.not_enough_oe_title', currentLang),
+          description: t('toast.not_enough_oe_desc', currentLang).replace('{cost}', String(currentCost)),
           type: 'info'
         });
         return false;
@@ -758,19 +790,20 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     addToast({
-      title: state.language === 'tr' ? `${def.name} Seviye ${currentLvl + 1}!` : `${def.name} Level ${currentLvl + 1}!`, description: state.language === 'tr' ? 'Geliştirme başarıyla satın alındı.' : 'Upgrade successfully purchased.',
+      title: t('toast.upgrade_bought_title', currentLang).replace('{name}', def.name).replace('{level}', String(currentLvl + 1)),
+      description: t('toast.upgrade_bought_desc', currentLang),
       type: 'info',
       icon: def.icon
     });
 
     return true;
-  }, [state.upgrades, state.xp, state.orangeEssence, addToast]);
+  }, [addToast]);
 
   const acceptDisclaimer = useCallback((username: string, avatarId: string) => {
     setState(prev => ({
       ...prev,
       hasAcceptedDisclaimer: true,
-      username: username.trim() || 'Çağrıcı',
+      username: username.trim() || (prev.language === 'en' ? 'Summoner' : 'Çağrıcı'),
       avatarChampionId: avatarId || 'MasterYi',
     }));
     soundFx.playButtonClick();
