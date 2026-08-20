@@ -81,8 +81,27 @@ export const BaronCenterArena: React.FC = () => {
       }
     };
 
+    // Prevent iOS Safari gesture zoom (pinch/double-tap) on the window/arena
+    const preventGesture = (e: Event) => {
+      e.preventDefault();
+    };
+
+    const arenaEl = arenaRef.current;
+    if (arenaEl) {
+      arenaEl.addEventListener('gesturestart', preventGesture);
+      arenaEl.addEventListener('gesturechange', preventGesture);
+      arenaEl.addEventListener('gestureend', preventGesture);
+    }
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (arenaEl) {
+        arenaEl.removeEventListener('gesturestart', preventGesture);
+        arenaEl.removeEventListener('gesturechange', preventGesture);
+        arenaEl.removeEventListener('gestureend', preventGesture);
+      }
+    };
   }, [isAlphaReady, isAlphaActive, triggerAlphaStrike]);
 
   return (
@@ -108,8 +127,9 @@ export const BaronCenterArena: React.FC = () => {
       <div
         ref={arenaRef}
         onClick={handleArenaClick}
-        className="relative w-full aspect-[16/9] max-h-[460px] bg-[#040c17] border-2 border-[#005a82]/60 hover:border-[#00c8c8] rounded-sm overflow-hidden shadow-[0_0_45px_rgba(0,0,0,0.95)] cursor-pointer group flex items-center justify-center transition-colors duration-200"
-        style={{ imageRendering: 'pixelated' }}
+        onDoubleClick={(e) => e.preventDefault()}
+        className="no-zoom-arena touch-manipulation select-none relative w-full aspect-[16/9] max-h-[460px] bg-[#040c17] border-2 border-[#005a82]/60 hover:border-[#00c8c8] rounded-sm overflow-hidden shadow-[0_0_45px_rgba(0,0,0,0.95)] cursor-pointer group flex items-center justify-center transition-colors duration-200"
+        style={{ imageRendering: 'pixelated', touchAction: 'manipulation' }}
       >
         {/* Pixel Art 2D Side-View Background Landscape */}
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">

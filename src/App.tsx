@@ -11,6 +11,7 @@ import { PrestigeShopModal } from './components/PrestigeShopModal';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { SkinUnlockModal } from './components/SkinUnlockModal';
 import { ToastContainer } from './components/ToastContainer';
+import { Footer } from './components/Footer';
 
 export function GameApp() {
   const { state, unlockedSkinModal, confirmAddUnlockedSkin, closeUnlockedSkinModal } = useGame();
@@ -84,6 +85,9 @@ export function GameApp() {
       />
 
       <ToastContainer />
+
+      {/* 6. Website Footer */}
+      <Footer />
     </div>
   );
 }

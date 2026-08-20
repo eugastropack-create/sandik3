@@ -1,1 +1,29 @@
 @import "tailwindcss";
+
+@layer base {
+  html, body {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Keep input fields selectable and focusable */
+  input, textarea, select {
+    -webkit-user-select: text;
+    user-select: text;
+    touch-action: auto;
+    font-size: 16px; /* Prevents auto-zoom in iOS Safari when focusing input */
+  }
+}
+
+/* Combat / Click Arena Specific touch rules */
+.no-zoom-arena {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
