@@ -27,7 +27,21 @@ export const BaronCenterArena: React.FC = () => {
   const [isAlphaActive, setIsAlphaActive] = useState(false);
   const [slashAngle, setSlashAngle] = useState(-30);
   const [slashPosition, setSlashPosition] = useState({ x: 35, y: 55 });
+  const [arcadeLevelUp, setArcadeLevelUp] = useState<{ level: number } | null>(null);
+  const prevLevelRef = useRef(state.level);
   const arenaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (state.level > prevLevelRef.current && prevLevelRef.current > 0) {
+      setArcadeLevelUp({ level: state.level });
+      const timer = setTimeout(() => {
+        setArcadeLevelUp(null);
+      }, 2600);
+      prevLevelRef.current = state.level;
+      return () => clearTimeout(timer);
+    }
+    prevLevelRef.current = state.level;
+  }, [state.level]);
 
   const handleArenaClick = (e: React.MouseEvent<HTMLDivElement>) => {
     let clickX = e.clientX;
@@ -167,7 +181,7 @@ export const BaronCenterArena: React.FC = () => {
           </div>
 
           {/* RIGHT SIDE: MASTER YI (Standing with Sword Tip Touching Baron) */}
-          <div className="flex flex-col items-center justify-end select-none -translate-x-3 sm:-translate-x-6 md:-translate-x-8">
+          <div className="relative flex flex-col items-center justify-end select-none -translate-x-3 sm:-translate-x-6 md:-translate-x-8 -translate-y-3 sm:-translate-y-5 md:-translate-y-6">
             {/* User / Summoner Header Tag */}
             <div className="mb-1 flex items-center gap-1.5 bg-[#010a13]/90 border border-[#00c8c8]/70 px-2.5 py-0.5 rounded-xs shadow">
               <div className="w-1.5 h-1.5 rounded-full bg-[#00ff88] animate-ping"></div>
@@ -183,8 +197,8 @@ export const BaronCenterArena: React.FC = () => {
               isAlphaStrike={isAlphaActive}
             />
 
-            {/* Alpha Strike Skill Button */}
-            <div className="mt-1 self-end translate-x-5 sm:translate-x-9 z-30" onClick={(e) => e.stopPropagation()}>
+            {/* Alpha Strike Skill Button - positioned at top-right */}
+            <div className="absolute top-1 -right-10 sm:-right-14 md:-right-16 z-30" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={handleAlphaStrikeClick}
                 disabled={!isAlphaReady}
@@ -271,7 +285,7 @@ export const BaronCenterArena: React.FC = () => {
         </div>
 
         {/* Bottom Click Hint & XP Progress */}
-        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 w-10/12 sm:w-11/12 max-w-xs z-20 pointer-events-none">
+        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 w-11/12 max-w-sm z-20 pointer-events-none">
           <div className="flex items-center gap-1 bg-black/30 px-2 py-0.5 rounded-full border border-[#00c8c8]/20">
             <Sparkles className="w-2.5 h-2.5 text-[#c8aa6e]" />
             <span className="text-[8px] text-[#a09b8c] uppercase tracking-widest font-bold">
@@ -279,19 +293,81 @@ export const BaronCenterArena: React.FC = () => {
             </span>
           </div>
           
-          <div className="w-full bg-black/20 border border-[#00c8c8]/30 px-2 py-0.5 rounded-xs backdrop-blur-[2px]">
-             <div className="flex justify-between text-[8px] uppercase tracking-widest text-[#a09b8c] mb-0.5 font-bold">
-                <span>{t('arena.xp_progress', state.language)}</span>
-                <span className="text-[#00c8c8]">{Math.round(state.xp)} / {xpNeeded}</span>
-             </div>
-             <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden border border-[#005a82]/30 p-px">
-                <div
-                  className="h-full bg-gradient-to-r from-[#00c8c8] to-[#005a82] rounded-full shadow-[0_0_6px_#00c8c8] transition-all duration-200"
-                  style={{ width: `${xpProgressPercent}%` }}
-                ></div>
-             </div>
+          <div className="w-full bg-black/40 border border-[#00c8c8]/30 px-2.5 py-1 rounded-xs backdrop-blur-[2px] flex items-center gap-2 shadow-md">
+            <span className="text-[#a09b8c] font-black text-[9px] uppercase tracking-wider shrink-0">XP</span>
+            <div className="flex-1 h-1.5 bg-black/60 rounded-full overflow-hidden border border-[#005a82]/40 p-px">
+              <div
+                className="h-full bg-gradient-to-r from-[#00c8c8] to-[#005a82] rounded-full shadow-[0_0_6px_#00c8c8] transition-all duration-200"
+                style={{ width: `${xpProgressPercent}%` }}
+              ></div>
+            </div>
+            <span className="text-[#00c8c8] font-bold text-[9px] tracking-wider shrink-0 font-mono">
+              {Math.round(state.xp)} / {xpNeeded}
+            </span>
           </div>
         </div>
+
+        {/* Arcade LEVEL UP Retro Visual Effect */}
+        <AnimatePresence>
+          {arcadeLevelUp && (
+            <motion.div
+              initial={{ scale: 0.1, opacity: 0, y: 40 }}
+              animate={{
+                scale: [0.1, 1.2, 1],
+                opacity: [0, 1, 1],
+                y: [40, -10, 0],
+              }}
+              exit={{ scale: 1.15, opacity: 0, y: -45 }}
+              transition={{ duration: 0.45, ease: 'backOut' }}
+              className="absolute inset-0 z-50 pointer-events-none flex flex-col items-center justify-center p-3"
+            >
+              {/* Radiant Arcade Background Pulse */}
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-[1.5px] animate-pulse"></div>
+              <div
+                className="absolute w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gradient-to-r from-[#00c8c8]/25 via-[#ffd700]/30 to-[#ff007f]/25 blur-xl animate-spin"
+                style={{ animationDuration: '6s' }}
+              ></div>
+
+              {/* Arcade Pixel Border Box */}
+              <div className="relative flex flex-col items-center bg-[#030914]/95 border-3 sm:border-4 border-[#ffd700] px-4 py-3 sm:px-8 sm:py-4 rounded shadow-[0_0_35px_rgba(255,215,0,0.8),inset_0_0_15px_rgba(0,200,200,0.5)]">
+                {/* CRT Scanlines Layer */}
+                <div className="absolute inset-0 pointer-events-none opacity-25 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.35)_50%)] bg-[length:100%_4px] rounded"></div>
+
+                {/* Subtitle / Stars */}
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[#ffd700] text-[10px] sm:text-xs animate-ping">★</span>
+                  <span className="text-[9px] sm:text-[11px] font-['Press_Start_2P',monospace] text-[#00ffff] tracking-widest drop-shadow-[0_0_6px_#00ffff]">
+                    {state.language === 'tr' ? 'TEBRİKLER!' : 'CONGRATULATIONS!'}
+                  </span>
+                  <span className="text-[#ffd700] text-[10px] sm:text-xs animate-ping">★</span>
+                </div>
+
+                {/* Arcade LEVEL UP Header */}
+                <div className="relative my-1 text-center">
+                  <h2
+                    className="text-xl sm:text-3xl md:text-4xl font-black font-['Press_Start_2P',monospace] tracking-wider text-transparent bg-clip-text bg-gradient-to-b from-[#ffff88] via-[#ffb700] to-[#ff3b00] drop-shadow-[0_0_12px_rgba(255,183,0,0.9)]"
+                    style={{
+                      textShadow: '3px 3px 0px #000, -2px -2px 0px #700',
+                    }}
+                  >
+                    LEVEL UP!
+                  </h2>
+                </div>
+
+                {/* Level Number & Key Earned Tag */}
+                <div className="mt-1.5 sm:mt-2 flex items-center gap-2 bg-black/85 border border-[#00c8c8] px-2.5 py-1 sm:px-4 sm:py-1.5 rounded shadow-[0_0_10px_#00c8c8]">
+                  <span className="text-[#00ff88] text-[10px] sm:text-xs font-['Press_Start_2P',monospace] animate-pulse">
+                    LVL {arcadeLevelUp.level}
+                  </span>
+                  <span className="text-[#a09b8c] font-mono text-xs">|</span>
+                  <span className="text-[#ffd700] text-[9px] sm:text-[10px] font-['Press_Start_2P',monospace]">
+                    +1 KEY 🗝️
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );
