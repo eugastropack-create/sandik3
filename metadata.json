@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Remix Remix LoL Hextech Clicker 2",
+  "description": "League of Legends themed Baron Nashor clicker game with Master Yi, Hextech chest opening simulator, Prestige skin shop, and Riot Data Dragon integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
